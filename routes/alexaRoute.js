@@ -41,45 +41,83 @@ try {
 const handlers = adapter.getRequestHandlers();
 console.log('📋 Handlers obtenidos:', Array.isArray(handlers) ? `${handlers.length} handlers` : typeof handlers);
 
-// Wrapper para capturar errores en los handlers
-const wrappedHandlers = handlers.map((handler, index) => {
-    return async (req, res, next) => {
-        try {
-            console.log(`🔄 Ejecutando handler ${index + 1}/${handlers.length}`);
-            await handler(req, res, (err) => {
-                if (err) {
-                    console.error(`❌ Error en handler ${index + 1}:`, err);
-                    console.error('Stack:', err.stack);
-                    return next(err);
-                }
-                console.log(`✅ Handler ${index + 1} completado sin errores`);
-                next();
-            });
-        } catch (error) {
-            console.error(`❌ Excepción no capturada en handler ${index + 1}:`, error);
-            console.error('Stack:', error.stack);
-            next(error);
-        }
-    };
-});
-
-// Middleware para logging y luego los handlers envueltos
+// Middleware para logging y captura de errores antes de los handlers
 alexaApp.post('/', (req, res, next) => {
     console.log('🔄 Iniciando procesamiento del request...');
     
+    // Capturar errores en el response
+    res.on('error', (err) => {
+        console.error('❌ Error en response object:', err);
+        console.error('Stack:', err.stack);
+    });
+    
     // Agregar listener para cuando se envíe la respuesta
     const originalEnd = res.end;
+    const originalJson = res.json;
+    const originalSend = res.send;
+    
     res.end = function(...args) {
-        console.log('📤 Respuesta enviada, status:', res.statusCode);
+        console.log('📤 res.end() llamado, status:', res.statusCode);
         console.log('📤 Headers enviados:', res.headersSent);
         if (res.statusCode >= 400) {
             console.error('❌ Error HTTP:', res.statusCode);
+            // Intentar leer el body si hay error
+            if (args[0]) {
+                console.error('📤 Body de error:', String(args[0]).substring(0, 500));
+            }
         }
         return originalEnd.apply(this, args);
     };
     
-    next();
-}, ...wrappedHandlers);
+    res.json = function(...args) {
+        console.log('📤 res.json() llamado, status:', res.statusCode);
+        if (res.statusCode >= 400) {
+            console.error('❌ Error en res.json(), body:', JSON.stringify(args[0]).substring(0, 500));
+        }
+        return originalJson.apply(this, args);
+    };
+    
+    res.send = function(...args) {
+        console.log('📤 res.send() llamado, status:', res.statusCode);
+        if (res.statusCode >= 400) {
+            console.error('❌ Error en res.send()');
+        }
+        return originalSend.apply(this, args);
+    };
+    
+    // Wrapper para capturar errores en next()
+    const wrappedNext = (err) => {
+        if (err) {
+            console.error('❌ Error pasado a next():', err);
+            console.error('Stack:', err.stack);
+        }
+        return next(err);
+    };
+    
+    // Ejecutar handlers con manejo de errores
+    let handlerIndex = 0;
+    const executeHandlers = () => {
+        if (handlerIndex < handlers.length) {
+            const handler = handlers[handlerIndex];
+            handlerIndex++;
+            try {
+                handler(req, res, (err) => {
+                    if (err) {
+                        console.error(`❌ Error en handler ${handlerIndex}:`, err);
+                        return wrappedNext(err);
+                    }
+                    executeHandlers();
+                });
+            } catch (error) {
+                console.error(`❌ Excepción en handler ${handlerIndex}:`, error);
+                console.error('Stack:', error.stack);
+                wrappedNext(error);
+            }
+        }
+    };
+    
+    executeHandlers();
+});
 
 // Middleware de manejo de errores global (debe ir después de las rutas)
 alexaApp.use((err, req, res, next) => {
