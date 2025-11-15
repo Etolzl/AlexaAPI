@@ -555,18 +555,35 @@ const DescubrirFocosIntent = {
       
       console.log('🔍 Descubriendo focos desde Alexa...');
       
-      // Obtener dispositivos de Alexa
-      const dispositivos = await obtenerDispositivosAlexa(apiAccessToken, apiEndpoint);
+      let dispositivos;
+      let focosAlexa;
       
-      // Filtrar solo focos con capacidad de color
-      const focosAlexa = filtrarFocos(dispositivos);
-      
-      if (!focosAlexa || focosAlexa.length === 0) {
-        return handlerInput.responseBuilder
-          .speak('No encontré focos RGB en tu cuenta de Alexa. Asegúrate de que tus focos estén vinculados a tu cuenta de Alexa y tengan capacidad de brillo o color.')
-          .reprompt('¿Hay algo más que pueda ayudarte?')
-          .withShouldEndSession(false)
-          .getResponse();
+      try {
+        // Obtener dispositivos de Alexa
+        dispositivos = await obtenerDispositivosAlexa(apiAccessToken, apiEndpoint);
+        
+        // Filtrar solo focos con capacidad de color
+        focosAlexa = filtrarFocos(dispositivos);
+        
+        if (!focosAlexa || focosAlexa.length === 0) {
+          return handlerInput.responseBuilder
+            .speak('No encontré focos RGB en tu cuenta de Alexa. Asegúrate de que tus focos estén vinculados a tu cuenta de Alexa y tengan capacidad de brillo o color.')
+            .reprompt('¿Hay algo más que pueda ayudarte?')
+            .withShouldEndSession(false)
+            .getResponse();
+        }
+      } catch (error) {
+        // Si la API no está disponible, informar al usuario
+        if (error.message === 'API_NOT_AVAILABLE' || error.message.includes('404') || error.message.includes('403')) {
+          console.warn('⚠️  La API de dispositivos no está disponible para Custom Skills');
+          return handlerInput.responseBuilder
+            .speak('La detección automática de focos no está disponible. Puedes registrar tus focos manualmente diciendo el nombre del foco, por ejemplo: "enciende Foco Sala". La skill lo registrará automáticamente.')
+            .reprompt('¿Quieres registrar un foco ahora?')
+            .withShouldEndSession(false)
+            .getResponse();
+        }
+        // Si es otro error, relanzarlo para que se maneje abajo
+        throw error;
       }
       
       console.log(`✅ Focos encontrados en Alexa: ${focosAlexa.length}`);
@@ -688,7 +705,12 @@ const ListarFocosIntent = {
             // Recargar focos
             focos = await FocoRGB.find({});
           } catch (error) {
-            console.error('Error en descubrimiento automático:', error);
+            // Si la API no está disponible, es normal - continuar con el flujo normal
+            if (error.message === 'API_NOT_AVAILABLE' || error.message.includes('404') || error.message.includes('403')) {
+              console.warn('⚠️  La API de dispositivos no está disponible, usando registro manual');
+            } else {
+              console.error('Error en descubrimiento automático:', error);
+            }
             // Continuar con el flujo normal
           }
         }
@@ -696,8 +718,8 @@ const ListarFocosIntent = {
       
       if (!focos || focos.length === 0) {
         return handlerInput.responseBuilder
-          .speak('No tienes focos configurados. Di "descubre mis focos" para buscarlos automáticamente en tu cuenta de Alexa, o regístralos manualmente.')
-          .reprompt('¿Quieres que descubra tus focos automáticamente?')
+          .speak('No tienes focos configurados. Puedes registrar un foco diciendo su nombre, por ejemplo: "enciende Foco Sala". La skill lo registrará automáticamente.')
+          .reprompt('¿Quieres registrar un foco ahora?')
           .withShouldEndSession(false)
           .getResponse();
       }

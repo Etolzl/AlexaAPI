@@ -16,6 +16,7 @@
 async function obtenerDispositivosAlexa(apiAccessToken, apiEndpoint = 'https://api.amazonalexa.com') {
   try {
     console.log('🔍 Obteniendo dispositivos de Alexa...');
+    console.log('📍 Endpoint:', `${apiEndpoint}/v2/devices`);
     
     const response = await fetch(`${apiEndpoint}/v2/devices`, {
       method: 'GET',
@@ -27,8 +28,16 @@ async function obtenerDispositivosAlexa(apiAccessToken, apiEndpoint = 'https://a
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ Error obteniendo dispositivos:', response.status, errorText);
-      throw new Error(`Error ${response.status}: ${errorText}`);
+      console.error('❌ Error obteniendo dispositivos:', response.status);
+      
+      // Detectar si la API no está disponible (404 o 403)
+      if (response.status === 404 || response.status === 403) {
+        console.warn('⚠️  La API de dispositivos no está disponible para Custom Skills');
+        throw new Error('API_NOT_AVAILABLE');
+      }
+      
+      console.error('Error completo:', errorText.substring(0, 200));
+      throw new Error(`Error ${response.status}: API no disponible`);
     }
     
     const data = await response.json();
@@ -36,7 +45,11 @@ async function obtenerDispositivosAlexa(apiAccessToken, apiEndpoint = 'https://a
     
     return data.devices || [];
   } catch (error) {
-    console.error('❌ Error en obtenerDispositivosAlexa:', error);
+    // Si es el error específico de API no disponible, relanzarlo
+    if (error.message === 'API_NOT_AVAILABLE') {
+      throw error;
+    }
+    console.error('❌ Error en obtenerDispositivosAlexa:', error.message);
     throw error;
   }
 }
