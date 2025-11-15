@@ -1,3 +1,5 @@
+const Alexa = require('ask-sdk-core');
+
 const SessionEndedRequest = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
@@ -16,8 +18,8 @@ const HelpIntent = {
     },
     handle(handlerInput) {
         return handlerInput.responseBuilder
-            .speak('Te ayudo a controlar tus entornos. Puedes decir: "activa" seguido del nombre del entorno para activarlo, "apaga" para desactivarlo, o "lista mis entornos" para ver todos los disponibles. También puedes decir "salir" cuando termines.')
-            .reprompt('¿Qué entorno te gustaría activar o desactivar?')
+            .speak('Te ayudo a controlar tus entornos y focos RGB. Para entornos, puedes decir: "activa" seguido del nombre del entorno, "apaga" para desactivarlo, o "lista mis entornos". Para focos, puedes decir: "enciende el foco", "apaga el foco", "cambia el color a rojo", o "pon el brillo al 50 por ciento". También puedes decir "lista mis focos" para ver los disponibles. Di "salir" cuando termines.')
+            .reprompt('¿Qué te gustaría hacer? Puedes controlar entornos o focos RGB.')
             .withShouldEndSession(false)
             .getResponse();
     }

@@ -10,6 +10,11 @@ MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database_name?re
 
 # Server Port (optional, defaults to 3000)
 PORT=3000
+
+# Alexa Skill ID (optional - solo si quieres validar que solo tu skill personal pueda usar el backend)
+# Formato: amzn1.ask.skill.xxxxx-xxxxx-xxxxx
+# Obtén tu Skill ID desde la consola de Alexa: https://developer.amazon.com/alexa/console/ask
+# ALEXA_SKILL_ID=amzn1.ask.skill.tu-skill-id-aqui
 ```
 
 ## Instalación

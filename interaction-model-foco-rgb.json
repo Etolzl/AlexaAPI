@@ -1,0 +1,213 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "work space",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "ActivateEnvironmentFreeTextIntent",
+                    "slots": [
+                        {
+                            "name": "environmentNameFree",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "Activa {environmentNameFree}",
+                        "Encender {environmentNameFree}",
+                        "Iniciar {environmentNameFree}",
+                        "Prender {environmentNameFree}",
+                        "Activar {environmentNameFree}",
+                        "Activa el entorno {environmentNameFree}",
+                        "Activa el escenario {environmentNameFree}",
+                        "Encender el entorno {environmentNameFree}",
+                        "Encender el escenario {environmentNameFree}"
+                    ]
+                },
+                {
+                    "name": "DeactivateEnvironmentFreeTextIntent",
+                    "slots": [
+                        {
+                            "name": "environmentNameFree",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "Apaga {environmentNameFree}",
+                        "Desactiva {environmentNameFree}",
+                        "Finaliza {environmentNameFree}",
+                        "Apaga el entorno {environmentNameFree}",
+                        "Apaga el escenario {environmentNameFree}",
+                        "Desactiva el entorno {environmentNameFree}",
+                        "Desactiva el escenario {environmentNameFree}",
+                        "Finaliza el entorno {environmentNameFree}",
+                        "Finaliza el escenario {environmentNameFree}"
+                    ]
+                },
+                {
+                    "name": "ListEnvironmentsIntent",
+                    "slots": [],
+                    "samples": [
+                        "Recuerdame mis entornos",
+                        "Recuerdame mis escenarios",
+                        "Qué escenarios tengo",
+                        "Lista de escenarios",
+                        "Lista de entornos",
+                        "Qué entornos tengo",
+                        "lista mis entornos",
+                        "muéstrame mis entornos",
+                        "cuáles son mis entornos"
+                    ]
+                },
+                {
+                    "name": "EncenderFocoIntent",
+                    "slots": [
+                        {
+                            "name": "focoName",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "Enciende el foco",
+                        "Enciende {focoName}",
+                        "Prende el foco",
+                        "Prende {focoName}",
+                        "Activa el foco",
+                        "Activa {focoName}",
+                        "Enciende la luz",
+                        "Prende la luz",
+                        "Activa la luz",
+                        "Enciende el foco {focoName}",
+                        "Prende el foco {focoName}",
+                        "Activa el foco {focoName}"
+                    ]
+                },
+                {
+                    "name": "ApagarFocoIntent",
+                    "slots": [
+                        {
+                            "name": "focoName",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "Apaga el foco",
+                        "Apaga {focoName}",
+                        "Apaga la luz",
+                        "Desactiva el foco",
+                        "Desactiva {focoName}",
+                        "Desactiva la luz",
+                        "Apaga el foco {focoName}",
+                        "Desactiva el foco {focoName}"
+                    ]
+                },
+                {
+                    "name": "CambiarColorFocoIntent",
+                    "slots": [
+                        {
+                            "name": "focoName",
+                            "type": "AMAZON.SearchQuery"
+                        },
+                        {
+                            "name": "color",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "Cambia el color a {color}",
+                        "Pon el color {color}",
+                        "Cambia a {color}",
+                        "Pon {color}",
+                        "Color {color}",
+                        "Cambia el color del foco a {color}",
+                        "Pon el color del foco en {color}",
+                        "Cambia {focoName} a {color}",
+                        "Pon {focoName} en {color}",
+                        "Cambia el color de {focoName} a {color}",
+                        "Pon el color de {focoName} en {color}",
+                        "Cambia la luz a {color}",
+                        "Pon la luz en {color}"
+                    ]
+                },
+                {
+                    "name": "CambiarBrilloFocoIntent",
+                    "slots": [
+                        {
+                            "name": "focoName",
+                            "type": "AMAZON.SearchQuery"
+                        },
+                        {
+                            "name": "brillo",
+                            "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "brilloText",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "Pon el brillo al {brillo}",
+                        "Cambia el brillo a {brillo}",
+                        "Brillo al {brillo}",
+                        "Pon el brillo a {brillo} por ciento",
+                        "Cambia el brillo a {brillo} por ciento",
+                        "Ajusta el brillo a {brillo}",
+                        "Pon el brillo del foco al {brillo}",
+                        "Cambia el brillo del foco a {brillo}",
+                        "Pon el brillo de {focoName} al {brillo}",
+                        "Cambia el brillo de {focoName} a {brillo}",
+                        "Pon el brillo de la luz al {brillo}",
+                        "Cambia el brillo de la luz a {brillo}",
+                        "Pon el brillo al {brilloText}",
+                        "Cambia el brillo a {brilloText}",
+                        "Brillo al {brilloText} por ciento"
+                    ]
+                },
+                {
+                    "name": "ListarFocosIntent",
+                    "slots": [],
+                    "samples": [
+                        "Lista mis focos",
+                        "Qué focos tengo",
+                        "Recuerdame mis focos",
+                        "Muéstrame mis focos",
+                        "Cuáles son mis focos",
+                        "Lista de focos",
+                        "Lista las luces",
+                        "Qué luces tengo"
+                    ]
+                },
+                {
+                    "name": "ExitSkillIntent",
+                    "slots": [],
+                    "samples": [
+                        "Salir",
+                        "Adiós",
+                        "Hasta luego",
+                        "Terminar",
+                        "Cerrar",
+                        "Me voy",
+                        "Chao",
+                        "Bye"
+                    ]
+                }
+            ]
+        }
+    }
+}
+
