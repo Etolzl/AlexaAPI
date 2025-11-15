@@ -120,10 +120,6 @@
                     "name": "CambiarColorFocoIntent",
                     "slots": [
                         {
-                            "name": "focoName",
-                            "type": "AMAZON.SearchQuery"
-                        },
-                        {
                             "name": "color",
                             "type": "AMAZON.SearchQuery"
                         }
@@ -143,10 +139,6 @@
                 {
                     "name": "CambiarBrilloFocoIntent",
                     "slots": [
-                        {
-                            "name": "focoName",
-                            "type": "AMAZON.SearchQuery"
-                        },
                         {
                             "name": "brillo",
                             "type": "AMAZON.NUMBER"
