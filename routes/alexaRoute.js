@@ -41,8 +41,29 @@ try {
 const handlers = adapter.getRequestHandlers();
 console.log('📋 Handlers obtenidos:', Array.isArray(handlers) ? `${handlers.length} handlers` : typeof handlers);
 
-// Usar el spread operator para aplicar todos los handlers
-alexaApp.post('/', ...handlers);
+// Wrapper para agregar logging a cada handler
+const wrappedHandlers = handlers.map((handler, index) => {
+    return async (req, res, next) => {
+        console.log(`🔄 Ejecutando handler ${index + 1}/${handlers.length}`);
+        try {
+            await handler(req, res, (err) => {
+                if (err) {
+                    console.error(`❌ Error en handler ${index + 1}:`, err);
+                    return next(err);
+                }
+                console.log(`✅ Handler ${index + 1} completado`);
+                next();
+            });
+        } catch (error) {
+            console.error(`❌ Excepción en handler ${index + 1}:`, error);
+            console.error('Stack:', error.stack);
+            next(error);
+        }
+    };
+});
+
+// Usar los handlers envueltos
+alexaApp.post('/', ...wrappedHandlers);
 
 // Middleware de manejo de errores global (debe ir después de las rutas)
 alexaApp.use((err, req, res, next) => {
