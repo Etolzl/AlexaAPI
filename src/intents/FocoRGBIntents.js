@@ -91,8 +91,8 @@ const EncenderFocoIntent = {
       await foco.save();
       
       return handlerInput.responseBuilder
-        .speak(`Perfecto, he encendido el foco ${foco.nombre}.`)
-        .reprompt('¿Quieres cambiar el color o el brillo?')
+        .speak(`Perfecto, he registrado que el foco ${foco.nombre} está encendido. Para controlarlo físicamente, di: "Alexa, enciende ${foco.nombreAlexa}". ¿Quieres cambiar el color o el brillo?`)
+        .reprompt('¿Qué te gustaría hacer con el foco?')
         .withShouldEndSession(false)
         .getResponse();
         
@@ -184,7 +184,7 @@ const ApagarFocoIntent = {
       await foco.save();
       
       return handlerInput.responseBuilder
-        .speak(`Listo, he apagado el foco ${foco.nombre}.`)
+        .speak(`Listo, he registrado que el foco ${foco.nombre} está apagado. Para controlarlo físicamente, di: "Alexa, apaga ${foco.nombreAlexa}". ¿Hay algo más que pueda ayudarte?`)
         .reprompt('¿Hay algo más que pueda ayudarte?')
         .withShouldEndSession(false)
         .getResponse();
