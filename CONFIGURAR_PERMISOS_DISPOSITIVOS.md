@@ -1,30 +1,36 @@
 # 🔐 Configurar Permisos para Detectar Dispositivos Alexa
 
-## ⚠️ Importante
+## ⚠️ Importante - Limitación de Custom Skills
 
-Para que la skill pueda detectar automáticamente tus focos vinculados en Alexa, necesitas configurar los **permisos de la skill** en la consola de desarrolladores.
+**Las Custom Skills de Alexa tienen acceso limitado a la API de dispositivos**. La API `/v2/devices` puede no estar disponible directamente desde Custom Skills sin permisos especiales que no aparecen en la lista estándar de permisos.
 
-## 📋 Pasos para Configurar Permisos
+## 🔍 Situación Actual
 
-### 1. Ir a la Configuración de Permisos
+Después de revisar los permisos disponibles en la consola de Alexa, **no existe un permiso específico** para "leer lista de dispositivos" en Custom Skills. Los permisos disponibles son principalmente para:
+- Dirección del dispositivo
+- Información del cliente (nombre, email, teléfono)
+- Listas de Alexa
+- Recordatorios
+- Servicios de ubicación
+- Personalización
 
-1. Ve a [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask)
-2. Selecciona tu skill
-3. Ve a **"Permissions"** en el menú lateral (o **"Permisos"**)
+## 🧪 Prueba Directa
 
-### 2. Habilitar Permisos de Dispositivos
+El código implementado intentará usar el `apiAccessToken` que viene automáticamente en cada request. **Puede funcionar sin permisos adicionales** si Alexa proporciona acceso básico a la API de dispositivos.
 
-Busca y habilita los siguientes permisos:
+### Pasos para Probar:
 
-- ✅ **"Read device address information"** (Leer información de dirección del dispositivo)
-- ✅ **"Read device location information"** (Leer información de ubicación del dispositivo)
-- ✅ **"Read device list information"** (Leer información de lista de dispositivos) ⭐ **Este es el más importante**
+1. **No necesitas configurar permisos adicionales** (por ahora)
+2. Prueba directamente diciendo: **"Alexa, abre work space y descubre mis focos"**
+3. Revisa los logs del servidor para ver si la API responde correctamente
 
-### 3. Guardar y Reconstruir
+### Si Funciona:
+- ✅ Verás en los logs: "✅ Dispositivos obtenidos: X dispositivos"
+- ✅ Los focos se registrarán automáticamente
 
-1. Guarda los cambios
-2. Ve a **"Build"** → **"Interaction Model"**
-3. Haz click en **"Build Model"** (aunque no hayas cambiado el modelo, a veces es necesario después de cambiar permisos)
+### Si NO Funciona:
+- ❌ Verás errores como "Error 403" o "Error 401" en los logs
+- ❌ La skill dirá: "No tengo acceso a tu cuenta de Alexa"
 
 ### 4. Probar la Funcionalidad
 
@@ -36,11 +42,21 @@ Una vez configurados los permisos, puedes probar:
 **O simplemente:**
 - "Alexa, abre work space y lista mis focos" (si no hay focos registrados, intentará descubrirlos automáticamente)
 
-## 🔍 Verificar que los Permisos Estén Activos
+## 🔄 Alternativa: Registro Manual
 
-Si los permisos no están configurados, verás un error como:
-- "No tengo acceso a tu cuenta de Alexa"
-- "Por favor, verifica los permisos de la skill"
+Si la detección automática no funciona (debido a limitaciones de la API), puedes registrar tus focos manualmente:
+
+### Opción 1: Usar el Script de Registro
+
+```bash
+npm run registrar-foco
+```
+
+Sigue las instrucciones para registrar tu foco "Foco Sala".
+
+### Opción 2: Registrar desde la Skill
+
+Puedes decir: **"Alexa, abre work space y enciende Foco Sala"** y la skill intentará registrar el foco automáticamente si no existe.
 
 ## 📝 Notas Importantes
 
@@ -67,36 +83,49 @@ Cuando dices "descubre mis focos", la skill:
 
 ### Error: "No tengo acceso a tu cuenta de Alexa"
 
+**Causa:** El `apiAccessToken` no está disponible o no tiene permisos para acceder a la API de dispositivos.
+
 **Solución:**
-1. Verifica que los permisos estén habilitados en la consola
-2. Reconstruye el modelo de interacción
-3. Vuelve a probar la skill
+1. **Registra tus focos manualmente** usando el script o diciendo el nombre del foco
+2. La skill funcionará normalmente para gestionar los focos registrados
+3. La detección automática es una funcionalidad adicional que puede no estar disponible
+
+### Error 403 o 401 en los logs
+
+**Causa:** La API de dispositivos no está disponible para Custom Skills sin permisos especiales.
+
+**Solución:**
+- Usa el registro manual de focos
+- La skill seguirá funcionando para gestionar los focos que registres
 
 ### No encuentra focos
 
 **Posibles causas:**
-1. Los focos no tienen capacidad de color configurada en Alexa
-2. Los focos no están vinculados correctamente
-3. Los permisos no están habilitados
+1. La API de dispositivos no está disponible para Custom Skills
+2. Los focos no tienen capacidad de color configurada en Alexa
+3. Los focos no están vinculados correctamente
 
 **Solución:**
-- Verifica en la app de Alexa que tus focos tengan capacidad de color
-- Asegúrate de que los focos estén vinculados a tu cuenta
-- Verifica los permisos de la skill
-
-### Error en la API
-
-Si ves errores en los logs como "Error 403" o "Error 401":
-- Los permisos no están configurados correctamente
-- El token de acceso no tiene los permisos necesarios
-- Verifica la configuración de permisos en la consola
+- **Registra tus focos manualmente** (esta es la forma más confiable)
+- Verifica en la app de Alexa que tus focos estén vinculados
+- Usa comandos directos de Alexa para controlar los focos físicamente
 
 ## ✅ Verificación
 
-Después de configurar los permisos, deberías poder:
+### Si la Detección Automática Funciona:
 
 1. ✅ Decir "descubre mis focos" y que la skill encuentre tus focos
 2. ✅ Ver en los logs: "✅ Dispositivos obtenidos: X dispositivos"
 3. ✅ Ver: "✅ Focos encontrados en Alexa: X"
 4. ✅ Los focos se registran automáticamente en la base de datos
+
+### Si la Detección Automática NO Funciona (Más Probable):
+
+1. ✅ Usa registro manual: `npm run registrar-foco`
+2. ✅ O di: "Alexa, abre work space y enciende Foco Sala" (la skill lo registrará si no existe)
+3. ✅ Una vez registrado, la skill funcionará normalmente para gestionar el foco
+
+## 📝 Nota Final
+
+**La detección automática es una funcionalidad experimental**. Si no funciona debido a limitaciones de la API de Alexa, no es un problema: puedes registrar tus focos manualmente y la skill funcionará perfectamente para gestionarlos.
 

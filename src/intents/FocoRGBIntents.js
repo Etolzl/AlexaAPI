@@ -78,11 +78,35 @@ const EncenderFocoIntent = {
       });
       
       if (!foco) {
-        return handlerInput.responseBuilder
-          .speak(`No encontré un foco llamado ${focoName}. ¿Podrías verificar el nombre?`)
-          .reprompt('¿Qué foco quieres encender?')
-          .withShouldEndSession(false)
-          .getResponse();
+        // Intentar registrar el foco automáticamente si no existe
+        try {
+          console.log(`📝 Foco "${focoName}" no encontrado, intentando registrarlo automáticamente...`);
+          const nuevoFoco = new FocoRGB({
+            nombre: focoName,
+            nombreAlexa: focoName,
+            estado: true, // Se está encendiendo
+            brillo: 50,
+            color: { rojo: 255, verde: 255, azul: 255 },
+            colorNombre: 'blanco'
+          });
+          await nuevoFoco.save();
+          console.log(`✅ Foco "${focoName}" registrado automáticamente`);
+          
+          await encenderFoco(focoName);
+          
+          return handlerInput.responseBuilder
+            .speak(`He registrado el foco ${focoName} y lo he marcado como encendido. Para controlarlo físicamente, di: "Alexa, enciende ${focoName}". ¿Quieres cambiar el color o el brillo?`)
+            .reprompt('¿Qué te gustaría hacer con el foco?')
+            .withShouldEndSession(false)
+            .getResponse();
+        } catch (error) {
+          console.error('Error registrando foco automáticamente:', error);
+          return handlerInput.responseBuilder
+            .speak(`No encontré un foco llamado ${focoName}. Puedes registrarlo manualmente o verificar el nombre. Di "lista mis focos" para ver los focos disponibles.`)
+            .reprompt('¿Qué foco quieres encender?')
+            .withShouldEndSession(false)
+            .getResponse();
+        }
       }
       
       // Controlar el dispositivo Alexa
