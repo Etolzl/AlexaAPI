@@ -133,7 +133,11 @@
                         "Cambia el color del foco a {color}",
                         "Pon el color del foco en {color}",
                         "Cambia la luz a {color}",
-                        "Pon la luz en {color}"
+                        "Pon la luz en {color}",
+                        "Quiero el color {color}",
+                        "Dame el color {color}",
+                        "Pon color {color}",
+                        "Cambiar color a {color}"
                     ]
                 },
                 {
@@ -161,7 +165,11 @@
                         "Cambia el brillo de la luz a {brillo}",
                         "Pon el brillo al {brilloText}",
                         "Cambia el brillo a {brilloText}",
-                        "Brillo al {brilloText} por ciento"
+                        "Brillo al {brilloText} por ciento",
+                        "Quiero brillo {brillo}",
+                        "Dame brillo {brillo}",
+                        "Brillo {brillo} por ciento",
+                        "Ajustar brillo {brillo}"
                     ]
                 },
                 {

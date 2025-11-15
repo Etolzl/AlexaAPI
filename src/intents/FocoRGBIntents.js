@@ -240,8 +240,46 @@ const CambiarColorFocoIntent = {
         .getResponse();
     }
     
+    // Limpiar el texto del color - extraer solo el nombre del color
+    // Remover palabras comunes que no son colores
+    const palabrasNoColor = ['el', 'la', 'de', 'del', 'foco', 'luz', 'brillo', 'al', 'a', 'por', 'ciento', '%', 'por ciento'];
+    let colorLimpio = colorName.toLowerCase().trim();
+    
+    // Remover palabras comunes
+    palabrasNoColor.forEach(palabra => {
+      const regex = new RegExp(`\\b${palabra}\\b`, 'gi');
+      colorLimpio = colorLimpio.replace(regex, '').trim();
+    });
+    
+    // Remover números y porcentajes (indica que es un comando de brillo, no color)
+    if (/\d+/.test(colorLimpio)) {
+      return handlerInput.responseBuilder
+        .speak('Parece que quieres cambiar el brillo, no el color. Di: "pon el brillo al 50 por ciento" o "cambia el brillo a 50".')
+        .reprompt('¿Quieres cambiar el color o el brillo?')
+        .withShouldEndSession(false)
+        .getResponse();
+    }
+    
+    // Extraer solo palabras que podrían ser colores
+    const palabras = colorLimpio.split(/\s+/).filter(p => p.length > 0);
+    
+    // Buscar el color en las palabras
+    let colorEncontrado = null;
+    for (const palabra of palabras) {
+      const colorInfo = normalizeColorName(palabra);
+      if (colorInfo) {
+        colorEncontrado = colorInfo;
+        break;
+      }
+    }
+    
+    // Si no se encontró en palabras individuales, intentar con el texto completo
+    if (!colorEncontrado) {
+      colorEncontrado = normalizeColorName(colorLimpio);
+    }
+    
     // Normalizar el color
-    const colorInfo = normalizeColorName(colorName);
+    const colorInfo = colorEncontrado;
     if (!colorInfo) {
       const coloresDisponibles = Object.keys(COLOR_MAP).join(', ');
       return handlerInput.responseBuilder
@@ -351,7 +389,7 @@ const CambiarBrilloFocoIntent = {
     
     // Obtener brillo
     const brilloSlot = intent.slots?.brillo;
-    if (brilloSlot && brilloSlot.value) {
+    if (brilloSlot && brilloSlot.value && brilloSlot.value !== '?') {
       brillo = parseInt(brilloSlot.value);
     }
     
@@ -359,9 +397,29 @@ const CambiarBrilloFocoIntent = {
     if (!brillo || isNaN(brillo)) {
       const brilloTextSlot = intent.slots?.brilloText;
       if (brilloTextSlot && brilloTextSlot.value) {
+        // Buscar números en el texto (puede ser "50", "50%", "50 por ciento", etc.)
         const match = brilloTextSlot.value.match(/\d+/);
         if (match) {
           brillo = parseInt(match[0]);
+        }
+      }
+    }
+    
+    // Si aún no hay brillo, verificar si el usuario dijo algo sobre color en lugar de brillo
+    if (!brillo || isNaN(brillo)) {
+      // Verificar si hay palabras de color en el slot (indica confusión)
+      const brilloTextSlot = intent.slots?.brilloText;
+      if (brilloTextSlot && brilloTextSlot.value) {
+        const texto = brilloTextSlot.value.toLowerCase();
+        const colores = Object.keys(COLOR_MAP);
+        const tieneColor = colores.some(color => texto.includes(color));
+        
+        if (tieneColor) {
+          return handlerInput.responseBuilder
+            .speak('Parece que quieres cambiar el color, no el brillo. Di: "cambia el color a rojo" o "pon el color azul".')
+            .reprompt('¿Quieres cambiar el color o el brillo?')
+            .withShouldEndSession(false)
+            .getResponse();
         }
       }
     }
