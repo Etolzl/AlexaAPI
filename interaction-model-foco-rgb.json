@@ -136,10 +136,6 @@
                         "Color {color}",
                         "Cambia el color del foco a {color}",
                         "Pon el color del foco en {color}",
-                        "Cambia {focoName} a {color}",
-                        "Pon {focoName} en {color}",
-                        "Cambia el color de {focoName} a {color}",
-                        "Pon el color de {focoName} en {color}",
                         "Cambia la luz a {color}",
                         "Pon la luz en {color}"
                     ]
@@ -169,8 +165,6 @@
                         "Ajusta el brillo a {brillo}",
                         "Pon el brillo del foco al {brillo}",
                         "Cambia el brillo del foco a {brillo}",
-                        "Pon el brillo de {focoName} al {brillo}",
-                        "Cambia el brillo de {focoName} a {brillo}",
                         "Pon el brillo de la luz al {brillo}",
                         "Cambia el brillo de la luz a {brillo}",
                         "Pon el brillo al {brilloText}",
