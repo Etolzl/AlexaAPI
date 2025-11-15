@@ -8,6 +8,96 @@
  */
 
 /**
+ * Obtiene los dispositivos vinculados en la cuenta de Alexa
+ * @param {string} apiAccessToken - Token de acceso de Alexa (viene en context.System.apiAccessToken)
+ * @param {string} apiEndpoint - Endpoint de la API de Alexa (viene en context.System.apiEndpoint)
+ * @returns {Promise<Array>} Lista de dispositivos
+ */
+async function obtenerDispositivosAlexa(apiAccessToken, apiEndpoint = 'https://api.amazonalexa.com') {
+  try {
+    console.log('🔍 Obteniendo dispositivos de Alexa...');
+    
+    const response = await fetch(`${apiEndpoint}/v2/devices`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiAccessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error obteniendo dispositivos:', response.status, errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`✅ Dispositivos obtenidos: ${data.devices?.length || 0} dispositivos`);
+    
+    return data.devices || [];
+  } catch (error) {
+    console.error('❌ Error en obtenerDispositivosAlexa:', error);
+    throw error;
+  }
+}
+
+/**
+ * Filtra dispositivos que son focos/luces con capacidad de color
+ * @param {Array} dispositivos - Lista de dispositivos de Alexa
+ * @returns {Array} Lista de focos filtrados
+ */
+function filtrarFocos(dispositivos) {
+  if (!dispositivos || !Array.isArray(dispositivos)) {
+    return [];
+  }
+  
+  return dispositivos.filter(dispositivo => {
+    console.log('🔍 Analizando dispositivo:', dispositivo.displayName || dispositivo.friendlyName, {
+      displayCategories: dispositivo.displayCategories,
+      capabilities: dispositivo.capabilities?.map(c => c.interface || c.type)
+    });
+    
+    // Verificar categoría de display (más confiable)
+    const esLuz = dispositivo.displayCategories?.some(cat => 
+      cat === 'LIGHT' || cat === 'SMARTPLUG' || cat === 'SWITCH'
+    );
+    
+    // Verificar capacidades
+    const tieneCapacidades = dispositivo.capabilities?.some(cap => {
+      const interfaceName = cap.interface || cap.type;
+      return interfaceName === 'Alexa.PowerController' || 
+             interfaceName === 'Alexa.ColorController' ||
+             interfaceName === 'Alexa.BrightnessController';
+    });
+    
+    // Verificar si tiene capacidad de color
+    const tieneColor = dispositivo.capabilities?.some(cap => {
+      const interfaceName = cap.interface || cap.type;
+      return interfaceName === 'Alexa.ColorController';
+    });
+    
+    // Si es una luz, la incluimos (especialmente si tiene brillo, que indica RGB)
+    // O si tiene capacidad de color explícita
+    const tieneBrillo = dispositivo.capabilities?.some(cap => {
+      const interfaceName = cap.interface || cap.type;
+      return interfaceName === 'Alexa.BrightnessController';
+    });
+    
+    // Incluir si:
+    // 1. Es una luz Y tiene brillo (probablemente RGB)
+    // 2. O tiene capacidad de color explícita
+    // 3. O es una luz con capacidades básicas (puede ser RGB)
+    const esFoco = (esLuz && tieneBrillo) || tieneColor || (esLuz && tieneCapacidades);
+    
+    if (esFoco) {
+      console.log('✅ Dispositivo identificado como foco:', dispositivo.displayName || dispositivo.friendlyName);
+    }
+    
+    return esFoco;
+  });
+}
+
+/**
  * Mapeo de nombres de colores a valores RGB
  */
 const COLOR_MAP = {
@@ -152,6 +242,8 @@ module.exports = {
   configurarFoco,
   normalizeColorName,
   normalizeBrightness,
-  COLOR_MAP
+  COLOR_MAP,
+  obtenerDispositivosAlexa,
+  filtrarFocos
 };
 

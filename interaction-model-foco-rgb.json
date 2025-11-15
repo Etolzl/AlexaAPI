@@ -187,6 +187,20 @@
                     ]
                 },
                 {
+                    "name": "DescubrirFocosIntent",
+                    "slots": [],
+                    "samples": [
+                        "Descubre mis focos",
+                        "Busca mis focos",
+                        "Encuentra mis focos",
+                        "Detecta mis focos",
+                        "Sincroniza mis focos",
+                        "Actualiza mis focos",
+                        "Descubre mis luces",
+                        "Busca mis luces"
+                    ]
+                },
+                {
                     "name": "ExitSkillIntent",
                     "slots": [],
                     "samples": [

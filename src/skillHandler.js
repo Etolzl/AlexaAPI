@@ -4,7 +4,7 @@ const { SessionEndedRequest, HelpIntent, CancelAndStopIntentHandler, UnhandledIn
 const { HelloWorldIntentHandler } = require('./intents/HelloWorldIntent');
 const { LaunchRequest } = require('./intents/LaunchIntent');
 const { ActivateEnvironmentIntent, DeactivateEnvironmentIntent, ListEnvironmentsIntent, ActivateEnvironmentSimpleIntent, DeactivateEnvironmentSimpleIntent, ActivateEnvironmentFreeTextIntent, DeactivateEnvironmentFreeTextIntent, ExitSkillIntent } = require('./intents/EnvironmentIntents');
-const { EncenderFocoIntent, ApagarFocoIntent, CambiarColorFocoIntent, CambiarBrilloFocoIntent, ListarFocosIntent } = require('./intents/FocoRGBIntents');
+const { EncenderFocoIntent, ApagarFocoIntent, CambiarColorFocoIntent, CambiarBrilloFocoIntent, ListarFocosIntent, DescubrirFocosIntent } = require('./intents/FocoRGBIntents');
 
 const createSkill = () => {
     const skillbuilder = Alexa.SkillBuilders.custom();
@@ -32,6 +32,7 @@ const createSkill = () => {
         CambiarColorFocoIntent,
         CambiarBrilloFocoIntent,
         ListarFocosIntent,
+        DescubrirFocosIntent,
         ExitSkillIntent,
         SessionEndedRequest,
         HelpIntent,
